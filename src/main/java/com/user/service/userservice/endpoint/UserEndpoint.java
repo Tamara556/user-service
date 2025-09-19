@@ -49,4 +49,15 @@ public class UserEndpoint {
         LoginResponseDTO response = userService.loginUser(loginRequestDTO);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * Get current user profile (protected endpoint)
+     *
+     * @return ResponseEntity with user profile information
+     */
+    @GetMapping("/profile")
+    public ResponseEntity<String> getUserProfile() {
+        log.info("Accessing user profile endpoint");
+        return ResponseEntity.ok("User profile accessed successfully! This is a protected endpoint.");
+    }
 }

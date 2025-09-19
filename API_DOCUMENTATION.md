@@ -36,7 +36,7 @@ Register a new user in the system.
 - `username`: Required, 3-50 characters, must be unique
 - `email`: Required, valid email format, must be unique
 - `password`: Required, minimum 8 characters
-- `fullName`: Optional
+- `full_name`: Optional
 
 #### Success Response (201 Created)
 ```json
@@ -61,16 +61,24 @@ Register a new user in the system.
 
 Authenticate user and receive JWT token.
 
-#### Request Body
+#### Request Body (Login with Email)
 ```json
 {
-  "emailOrUsername": "john.doe@example.com",
+  "email": "john.doe@example.com",
+  "password": "securePassword123"
+}
+```
+
+#### Request Body (Login with Username)
+```json
+{
+  "username": "johndoe",
   "password": "securePassword123"
 }
 ```
 
 #### Validation Rules
-- `emailOrUsername`: Required, 3-100 characters (can be email or username)
+- `email` or `username`: Required, 3-100 characters (can be either email or username)
 - `password`: Required, minimum 8 characters
 
 #### Success Response (200 OK)
@@ -148,16 +156,26 @@ curl -X POST http://localhost:8081/api/user/register \
     "username": "johndoe",
     "email": "john.doe@example.com",
     "password": "securePassword123",
-    "fullName": "John Doe"
+    "full_name": "John Doe"
   }'
 ```
 
-#### Login User
+#### Login User (with Email)
 ```bash
 curl -X POST http://localhost:8081/api/user/login \
   -H "Content-Type: application/json" \
   -d '{
-    "emailOrUsername": "john.doe@example.com",
+    "email": "john.doe@example.com",
+    "password": "securePassword123"
+  }'
+```
+
+#### Login User (with Username)
+```bash
+curl -X POST http://localhost:8081/api/user/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
     "password": "securePassword123"
   }'
 ```
@@ -172,9 +190,15 @@ curl -X GET http://localhost:8081/api/user/profile \
 
 #### Using Builder Pattern for DTOs
 ```java
-// Creating LoginRequestDTO using builder
+// Creating LoginRequestDTO using builder (with email)
 LoginRequestDTO loginRequest = LoginRequestDTO.builder()
-    .emailOrUsername("john.doe@example.com")
+    .emailOrUsername("john.doe@example.com")  // This maps to "email" or "username" in JSON
+    .password("securePassword123")
+    .build();
+
+// Creating LoginRequestDTO using builder (with username)
+LoginRequestDTO loginRequest2 = LoginRequestDTO.builder()
+    .emailOrUsername("johndoe")  // This maps to "email" or "username" in JSON
     .password("securePassword123")
     .build();
 
@@ -183,7 +207,7 @@ RegisterRequestDTO registerRequest = RegisterRequestDTO.builder()
     .username("johndoe")
     .email("john.doe@example.com")
     .password("securePassword123")
-    .fullName("John Doe")
+    .fullName("John Doe")  // This maps to "full_name" in JSON
     .build();
 
 // Using static factory methods for responses
