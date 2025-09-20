@@ -7,11 +7,19 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler for the User Service application
+ * Catches and processes exceptions thrown by controllers
+ * Returns standardized error responses
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -94,6 +102,42 @@ public class GlobalExceptionHandler {
             LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        log.warn("Malformed JSON request: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Bad Request",
+            "Malformed JSON in request body",
+            LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found",
+            "The requested resource was not found",
+            LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        log.warn("HTTP method not supported: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.METHOD_NOT_ALLOWED.value(),
+            "Method Not Allowed",
+            "The requested HTTP method is not supported for this endpoint",
+            LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
